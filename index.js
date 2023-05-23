@@ -38,18 +38,32 @@ async function run() {
       res.send(result);
     });
 
-     
-    // sub-category
-    app.get('/toys/:text', async(req, res) => {
-      if (req.params.text == "Dogs" || req.params.text == "Tiger" || req.params.text == "Dinosaur" ) {
-        const result = await toyCollection.find({category: req.params.text}).toArray();
-        return res.send(result);
-      }
-      const result =  await toyCollection.find({}).toArray();
+    // find single toy data
+    app.get('/toy/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+
+      const options = {
+        // Include only the `title` and `imdb` fields in the returned document
+        projection: { toy_name: 1, image: 1, category: 1, price: 1, rating: 1, available_quan: 1, description: 1 },
+      };
+
+      const result = await toyCollection.findOne(query, options);
       res.send(result);
     });
-    
-    app.get('/toypost', async(req, res) => {
+
+
+    // sub-category
+    app.get('/toys/:text', async (req, res) => {
+      if (req.params.text == "Dogs" || req.params.text == "Tiger" || req.params.text == "Dinosaur") {
+        const result = await toyCollection.find({ category: req.params.text }).toArray();
+        return res.send(result);
+      }
+      const result = await toyCollection.find({}).toArray();
+      res.send(result);
+    });
+
+    app.get('/toypost', async (req, res) => {
       const cursor = toypostCollection.find();
       const result = await cursor.toArray();
       res.send(result);
@@ -58,14 +72,14 @@ async function run() {
     // delete toy
     app.delete('/toypost/:id', async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)}
+      const query = { _id: new ObjectId(id) }
       const result = await toypostCollection.deleteOne(query);
       res.send(result);
     })
 
     app.get('/toypost/:id', async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)}
+      const query = { _id: new ObjectId(id) }
       const result = await toypostCollection.findOne(query);
       res.send(result);
     })
